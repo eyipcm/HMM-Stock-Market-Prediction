@@ -22,7 +22,6 @@ sys.path.append('libs')
 
 # Create output directories
 os.makedirs('output_figs', exist_ok=True)
-os.makedirs('models', exist_ok=True)
 os.makedirs('train', exist_ok=True)
 
 from init_config import init_config
@@ -334,7 +333,7 @@ def create_candlestick_plot(prediction_data, predicted_close, config):
         # Get the numeric positions for valid predictions (same as candlesticks)
         valid_indices = np.where(valid_predictions)[0]
         
-        # Plot prediction line segments (like MATLAB does)
+        # Plot prediction arrows (showing direction)
         for i, pred_idx in enumerate(valid_indices):
             current_index = pred_idx
             current_prediction = predicted_close[pred_idx]
@@ -346,27 +345,31 @@ def create_candlestick_plot(prediction_data, predicted_close, config):
             predicted_direction = np.sign(current_prediction - current_open)
             is_correct = actual_direction == predicted_direction
             
-            # Create line segment - connect from previous close to current prediction
+            # Create arrow - connect from previous close to current prediction
             if i == 0:
-                # For first prediction, just plot the point
-                x_data = [current_index]
-                y_data = [current_prediction]
+                # For first prediction, just plot the point with arrow
+                ax.annotate('', xy=(current_index, current_prediction), 
+                           xytext=(current_index, current_prediction),
+                           arrowprops=dict(arrowstyle='->', color='g' if is_correct else 'r', 
+                                         lw=1.5, alpha=0.8))
             else:
-                # Connect from previous actual close to current prediction
+                # Connect from previous actual close to current prediction with arrow
                 prev_index = valid_indices[i-1]
                 prev_close = prediction_data['Close'].iloc[prev_index]
-                x_data = [prev_index, current_index]
-                y_data = [prev_close, current_prediction]
-            
-            # Plot with appropriate color
-            color = 'g' if is_correct else 'r'
-            ax.plot(x_data, y_data, color=color, linewidth=0.5, marker='.', markersize=3)
+                
+                # Create arrow
+                color = 'g' if is_correct else 'r'
+                ax.annotate('', xy=(current_index, current_prediction), 
+                           xytext=(prev_index, prev_close),
+                           arrowprops=dict(arrowstyle='->', color=color, 
+                                         lw=1.5, alpha=0.8, shrinkA=0, shrinkB=0))
         
         # Create legend manually (like MATLAB does)
         from matplotlib.lines import Line2D
+        from matplotlib.patches import FancyArrowPatch
         legend_elements = [
-            Line2D([0], [0], color='g', marker='.', markersize=20, label='Close predictions (correct direction)'),
-            Line2D([0], [0], color='r', marker='.', markersize=20, label='Close predictions (wrong direction)')
+            Line2D([0], [0], color='g', marker='o', markersize=8, label='Close predictions (correct direction)'),
+            Line2D([0], [0], color='r', marker='o', markersize=8, label='Close predictions (wrong direction)')
         ]
         ax.legend(handles=legend_elements, loc='upper left')
     
@@ -388,13 +391,13 @@ def create_prediction_plot(prediction_data, predicted_close, config):
     ax.plot(prediction_data['Date'], prediction_data['Close'], 'b-', 
             linewidth=0.5, marker='.', markersize=3, label='Actual stock close')
     
-    # Plot prediction line segments (like MATLAB does)
+    # Plot prediction arrows (showing direction)
     valid_predictions = ~np.isnan(predicted_close)
     if np.any(valid_predictions):
         # Get indices where we have valid predictions
         valid_indices = np.where(valid_predictions)[0]
         
-        # For each valid prediction, create a line segment
+        # For each valid prediction, create an arrow
         for i, pred_idx in enumerate(valid_indices):
             current_date = prediction_data['Date'].iloc[pred_idx]
             current_prediction = predicted_close[pred_idx]
@@ -406,28 +409,31 @@ def create_prediction_plot(prediction_data, predicted_close, config):
             predicted_direction = np.sign(current_prediction - current_open)
             is_correct = actual_direction == predicted_direction
             
-            # Create line segment - MATLAB connects from previous close to current prediction
+            # Create arrow - connect from previous close to current prediction
             if i == 0:
-                # For first prediction, just plot the point
-                x_data = [current_date]
-                y_data = [current_prediction]
+                # For first prediction, just plot the point with arrow
+                ax.annotate('', xy=(current_date, current_prediction), 
+                           xytext=(current_date, current_prediction),
+                           arrowprops=dict(arrowstyle='->', color='g' if is_correct else 'r', 
+                                         lw=1.5, alpha=0.8))
             else:
-                # Connect from previous actual close to current prediction
+                # Connect from previous actual close to current prediction with arrow
                 prev_date = prediction_data['Date'].iloc[valid_indices[i-1]]
                 prev_close = prediction_data['Close'].iloc[valid_indices[i-1]]
-                x_data = [prev_date, current_date]
-                y_data = [prev_close, current_prediction]
-            
-            # Plot with appropriate color
-            color = 'g' if is_correct else 'r'
-            ax.plot(x_data, y_data, color=color, linewidth=0.3, marker='.', markersize=5)
+                
+                # Create arrow
+                color = 'g' if is_correct else 'r'
+                ax.annotate('', xy=(current_date, current_prediction), 
+                           xytext=(prev_date, prev_close),
+                           arrowprops=dict(arrowstyle='->', color=color, 
+                                         lw=1.5, alpha=0.8, shrinkA=0, shrinkB=0))
     
     # Create legend manually (like MATLAB does)
     from matplotlib.lines import Line2D
     legend_elements = [
         Line2D([0], [0], color='b', marker='.', markersize=20, label='Actual stock close'),
-        Line2D([0], [0], color='g', marker='.', markersize=20, label='Close predictions (correct direction)'),
-        Line2D([0], [0], color='r', marker='.', markersize=20, label='Close predictions (wrong direction)')
+        Line2D([0], [0], color='g', marker='o', markersize=8, label='Close predictions (correct direction)'),
+        Line2D([0], [0], color='r', marker='o', markersize=8, label='Close predictions (wrong direction)')
     ]
     ax.legend(handles=legend_elements, loc='upper left')
     
