@@ -34,13 +34,3 @@ codegen/
 octave-workspace
 .MATLABDriveTag
 .DS_Store
-
-#png
-*.png
-/m2py/test
-/m2py/output_figs
-/m2py/train/*.pkl
-!/m2py/train/hmmtrain-20250904184643.pkl
-
-#comparison_results
-/m2py/utils/comparison_results

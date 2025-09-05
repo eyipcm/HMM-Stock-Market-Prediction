@@ -1,0 +1,9 @@
+#png
+*.png
+test
+output_figs
+train/*.pkl
+!train/hmmtrain-20250904184643.pkl
+
+#comparison_results
+utils/comparison_results
