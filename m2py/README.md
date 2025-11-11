@@ -391,7 +391,7 @@ Analysis complete!
 
 ## 📄 License
 
-See [LICENSE](../LICENSE.md) file.
+See [LICENSE](LICENSE) file.
 
 ## 🤝 Contributing
 
